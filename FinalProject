@@ -1,0 +1,91 @@
+#import CSV to manipulate data easier
+import csv, numpy
+records = {}
+#open file and create a dictionary with ID Number
+try:
+	with open('Records.csv') as csvfile:
+	    readCSV = csv.reader(csvfile, delimiter=',')
+	    for row in readCSV:
+
+	    	dic = {
+	    		row[6]: row
+	    	}
+
+	    	records.update(dic)
+#if exception is raised: program continues	        
+except IOError:
+   print ("Could not read file:", csvfile)
+#print highest, lowest, and top 10 highest/lowest amounts
+def getProfitData(records):
+	prof = {}
+	
+	for a in records:
+		p = {
+			a: records[a][13]
+		}
+		prof.update(p)
+
+	del prof['Order ID']
+
+	for p in prof:
+		prof[p] = float(prof[p])
+	
+	minkey = min(prof, key=prof.get)
+	maxkey = max(prof, key=prof.get)
+
+	maxmin = [maxkey, prof[maxkey], minkey, prof[minkey]]
+	
+	tenhighestID = sorted(prof, key=prof.get, reverse=True)[:10]
+
+	tenlowestID = sorted(prof, key=prof.get, reverse=False)[:10]
+
+	return [maxmin, tenhighestID, tenlowestID]
+
+def profit(data):
+	maxval = data[0][1]
+	maxID = data[0][0]
+	minval = data[0][3]
+	minID = data[0][2]
+	
+	tenhighestID = data[1]
+	tenlowestID = data[2]
+
+	highestData = []
+	lowestData = []
+
+	for i in tenhighestID:
+		hold = [records[i][13], records[i][6], records[i][5]]
+		highestData.append(hold)
+
+	for i in tenlowestID:
+		hold = [records[i][13], records[i][6], records[i][5]]
+		lowestData.append(hold)
+
+	return [maxval, maxID, minval, minID, highestData, lowestData]
+
+
+print(profit(getProfitData(records)))
+print('')
+#Receive user input and then find specific record
+def searchRecords():
+	print('Order Search Function')
+	print('******************************************************************')
+	idNum = str(input('Please enter an Order ID to locate: '))
+	records = {}
+	with open('Records.csv') as csvfile:
+		readCSV = csv.reader(csvfile, delimiter=',')
+		for row in readCSV:
+	   		records[row[6]] = row
+	if idNum in records:
+		row = records[idNum]
+		print('Order ID:              ',row[6])
+		print('Ship Date:             ',row[5])
+		print('Total Profit:         $',row[13])
+	else:
+		print('Unable to locate Order ID')
+searchRecords()
+print('')
+print('')
+print('')
+print('Deserialized Object')
+print('******************************************************************')
